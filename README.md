@@ -1,12 +1,22 @@
 # UnderstandingAuditdRules
-This is an overview of writing auditd rules for linux
+This is an overview of writing auditd rules for Linux. 
 
+This example shows how to monitoring the duration a file exists within the /tmp directory.
+
+Create a single rule file /etc/audit/rules.d/tmp.rules with the sole entry 
 
 ```
-# grep files_in_tmp /var/log/audit/audit.log
+-w /tmp –p –w –k files
 ```
 
-Upon restart there is an entry in the log showing the rule was added. 
+Which can be understood as follows: 
+“-w /tmp” means “watch /tmp”
+“-p –w” means “when the permissions are writing to a file”
+“-k tmpfiles” means “add a string to the log entry with the keyname tmpfiles so I can search the log for these entries”. 
+
+Once this rule is in place it requires a restart of the audit daemon. 
+
+Upon restart of the daemon there is an entry in the log showing the rule was added. 
 ```
 type=CONFIG_CHANGE msg=audit(1512079682.652:109082): auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 op=add_rule key="files_in_tmp" list=4 res=1
 ```
