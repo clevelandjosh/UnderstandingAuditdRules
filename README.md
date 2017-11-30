@@ -6,13 +6,13 @@ This example shows how to monitoring the duration a file exists within the /tmp 
 Create a single rule file /etc/audit/rules.d/tmp.rules with the sole entry 
 
 ```
--w /tmp –p –w –k files
+-w /tmp –p –w –k files_in_tmp
 ```
 
 Which can be understood as follows: 
 - “-w /tmp” means “watch /tmp”
 - “-p –w” means “when the permissions are writing to a file”
-- “-k tmpfiles” means “add a string to the log entry with the keyname tmpfiles so I can search the log for these entries”. 
+- “-k files_in_tmp” means “add a string to the log entry with the keyname 'files_in_tmp' so we can search the log for these entries”. 
 
 Once this rule is in place it requires a restart of the audit daemon. 
 
@@ -77,11 +77,19 @@ type=SYSCALL msg=audit(1512079836.755:109108): arch=c000003e syscall=2 success=y
 #### And lastly removing the file in the subdirectory
 ```
 [root@ip /]# rm /tmp/foodir/foofile
+rm: remove regular empty file ‘/tmp/foodir/foofile’? y
 ```
 #### Creates the following
 ```
-rm: remove regular empty file ‘/tmp/foodir/foofile’? y
 type=SYSCALL msg=audit(1512079845.198:109109): arch=c000003e syscall=263 success=yes exit=0 a0=ffffffffffffff9c a1=11090c0 a2=0 a3=7ffc372db250 items=2 ppid=18028 pid=21248 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=9807 comm="rm" exe="/usr/bin/rm" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="files_in_tmp"
 ```
+
+The only remaining task will be to correlate files created to when they are removed.
+
+Fortunately these logs are well structured. 
+
+
+
+
 
 
