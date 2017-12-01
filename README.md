@@ -1,5 +1,5 @@
 # UnderstandingAuditdRules
-#### This is an overview of writing auditd rules for Linux. 
+#### This is an overview of writing a sample auditd rule for Linux. 
 
 This example shows how to monitoring the duration a file exists within the /tmp directory.
 
