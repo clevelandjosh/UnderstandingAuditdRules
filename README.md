@@ -105,9 +105,35 @@ type=PROCTITLE msg=audit(1512079845.198:109109): proctitle=726D002D69002F746D702
 ### This block, shows more interesting and human readable events and paints a complete picture of who did what to which file, when.
 #### This can act as a jump off point for calculating the file lifetime as well as what specifically is creating the files. 
 
-#### Alternatively, if there isn't robust audit logging already in place, and using the key tags is not required 
-#### simply grepping for the "/tmp" string should prove adequate for getting the file lifetime (sorting on name and objtype per entry)
-#### only if further finding out the file creation is the deeper insight of value. 
+#### Alternatively, if there isn't robust audit logging already in place (other logs to contend with), and using the key tags is not required 
+#### simply grepping for the 'CREATE\|DELETE' string, redirecting the output to a single file, should prove adequate for getting the file lifetime (sorting on name, time, and objtype per entry, as needed). 
+
+```
+grep 'CREATE\|DELETE' /var/log/audit/audit.log.1
+type=PATH msg=audit(1512077978.266:108846): item=1 name="foo" inode=12818926 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512078001.433:108854): item=1 name="foo" inode=12818926 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512078028.481:108855): item=1 name="foodir" inode=54554503 dev=ca:02 mode=040755 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512078058.781:108857): item=1 name="/tmp/foodir/foofile" inode=54554504 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079639.420:109060): item=1 name="/tmp/foodir/foofile" inode=54554504 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079647.426:109062): item=1 name="/tmp/foodir" inode=54554503 dev=ca:02 mode=040755 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079682.635:109075): item=1 name="/tmp/aurules.ELI4cPCR" inode=12818926 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079682.651:109078): item=1 name="/tmp/aurules.ELI4cPCR" inode=12818926 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079784.674:109091): item=1 name="/tmp/foo" inode=12818926 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079791.931:109092): item=1 name="/tmp/.foo.swp" inode=12818930 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079791.931:109093): item=1 name="/tmp/.foo.swpx" inode=12818931 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079791.931:109094): item=1 name="/tmp/.foo.swpx" inode=12818931 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079791.931:109095): item=1 name="/tmp/.foo.swp" inode=12818930 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079791.931:109096): item=1 name="/tmp/.foo.swp" inode=12818930 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079798.872:109098): item=1 name="/tmp/.foo.swp" inode=12818930 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079810.810:109106): item=1 name="/tmp/foo" inode=12818926 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512079821.330:109107): item=1 name="/tmp/foodir" inode=94714 dev=ca:02 mode=040755 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079836.755:109108): item=1 name="/tmp/foodir/foofile" inode=94715 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512079845.198:109109): item=1 name="/tmp/foodir/foofile" inode=94715 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=DELETE
+type=PATH msg=audit(1512083182.319:109525): item=1 name="/tmp/aurules.wG5WMtXt" inode=12818926 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:tmp_t:s0 objtype=CREATE
+type=PATH msg=audit(1512083182.334:109528): item=1 name="/tmp/aurules.wG5WMtXt" inode=12818926 dev=ca:02 mode=0100600 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:tmp_t:s0 objtype=DELETE
+```
+
+#### Only if we are planning on further finding out what initiated the file creation is the deeper insight of value. 
 
 
 
