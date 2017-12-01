@@ -108,6 +108,8 @@ type=PROCTITLE msg=audit(1512079845.198:109109): proctitle=726D002D69002F746D702
 #### Alternatively, if there isn't robust audit logging already in place (other logs to contend with), and using the key tags is not required 
 #### simply grepping for the 'CREATE\|DELETE' string, redirecting the output to a single file, should prove adequate for getting the file lifetime (sorting on name, time, and objtype per entry, as needed). 
 
+#### It should be noted that when writing to a file using a text editor there are a lot of CREATES and DELETES that occur on the .swp file, as it gets consistently recreated. These would greatly skew any averaging.
+
 ```
 grep 'CREATE\|DELETE' /var/log/audit/audit.log.1
 type=PATH msg=audit(1512077978.266:108846): item=1 name="foo" inode=12818926 dev=ca:02 mode=0100644 ouid=0 ogid=0 rdev=00:00 obj=unconfined_u:object_r:user_tmp_t:s0 objtype=CREATE
