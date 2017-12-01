@@ -84,17 +84,16 @@ rm: remove regular empty file ‘/tmp/foodir/foofile’? y
 type=SYSCALL msg=audit(1512079845.198:109109): arch=c000003e syscall=263 success=yes exit=0 a0=ffffffffffffff9c a1=11090c0 a2=0 a3=7ffc372db250 items=2 ppid=18028 pid=21248 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=9807 comm="rm" exe="/usr/bin/rm" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="files_in_tmp"
 ```
 
-### NOTICE A PROBLEM WITH THESE LOGS SO FAR?
-#### Drumroll....
+### Notice these logs were grepped for the key "files_in_tmp"
+###  This will show the Syscall but not the PATH statements (This is like having the verb in a sentence, without the noun) 
 
-### NO FILES LISTED, JUST THE ACTION IS LINKED WITH THE KEY!!!
-
-#### Fortunately these logs are well structured and the missing event information (not key tagged) can be correlated by the timestamp and event id/
+#### Fortunately these logs are well structured and the missing event information (not key tagged) can be correlated by the timestamp and event ids. 
 ```
-This part -> msg=audit(1512079845.198:109109), or more specifically 1512079845.198:109109
+This part -> msg=audit(1512079845.198:109109)
+or more specifically -> "1512079845.198:109109"
 ```
 
-#### Lets look at this id to see the file that was removed (lets pretend we didn't know it was /tmp/foodir/foofile)
+#### Lets look at this id to see the file that was removed (pretending we didn't know it was /tmp/foodir/foofile)
 ```
  grep 1512079845.198:109109 /var/log/audit/audit.log.1
 type=SYSCALL msg=audit(1512079845.198:109109): arch=c000003e syscall=263 success=yes exit=0 a0=ffffffffffffff9c a1=11090c0 a2=0 a3=7ffc372db250 items=2 ppid=18028 pid=21248 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=9807 comm="rm" exe="/usr/bin/rm" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key="files_in_tmp"
@@ -105,6 +104,10 @@ type=PROCTITLE msg=audit(1512079845.198:109109): proctitle=726D002D69002F746D702
 ```
 ### This block, shows more interesting and human readable events and paints a complete picture of who did what to which file, when.
 #### This can act as a jump off point for calculating the file lifetime as well as what specifically is creating the files. 
+
+#### Alternatively, if there isn't robust audit logging already in place, and using the key tags is not required 
+#### simply grepping for the "/tmp" string should prove adequate for getting the file lifetime (sorting on name and objtype per entry)
+#### only if further finding out the file creation is the deeper insight of value. 
 
 
 
