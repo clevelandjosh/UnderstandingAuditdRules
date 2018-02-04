@@ -35,11 +35,14 @@ cp /usr/lib/systemd/system/auditd.service /etc/systemd/system/auditd.service
 ```
 then edit /etc/systemd/system/auditd.service according to the comments in the file
 Raw
+```
  ## To not use augenrules, copy this file to /etc/systemd/system/auditd.service
  ## and comment/delete the next line and uncomment the auditctl line.
  ## NOTE: augenrules expect any rules to be added to /etc/audit/rules.d/
 ###  ExecStartPost=-/sbin/augenrules --load <--- THIS GETS COMMENTED OUT
 ExecStartPost=-/sbin/auditctl -R /etc/audit/audit.rules # <--- THIS GETS UNCOMMENTED
+```
+
 Reload systemd daemon to reload changes made in auditd service unit file:
 
 ```
