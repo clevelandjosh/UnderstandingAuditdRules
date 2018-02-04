@@ -16,6 +16,39 @@ Which can be understood as follows: 
 
 Once this rule is in place it requires a restart of the audit daemon. 
 
+Note - One may need to do the following to get the audit.d, upon restart, to read the rules in from /etc/audit/rules.d/
+
+Red Hat Enterprise Linux 6
+
+Set in /etc/sysconfig/auditd
+```
+USE_AUGENRULES=no
+```
+Restart the auditd service: 
+```
+service auditd restart
+```
+
+Red Hat Enterprise Linux 7
+```
+cp /usr/lib/systemd/system/auditd.service /etc/systemd/system/auditd.service
+```
+then edit /etc/systemd/system/auditd.service according to the comments in the file
+Raw
+ ## To not use augenrules, copy this file to /etc/systemd/system/auditd.service
+ ## and comment/delete the next line and uncomment the auditctl line.
+ ## NOTE: augenrules expect any rules to be added to /etc/audit/rules.d/
+###  ExecStartPost=-/sbin/augenrules --load <--- THIS GETS COMMENTED OUT
+ExecStartPost=-/sbin/auditctl -R /etc/audit/audit.rules # <--- THIS GETS UNCOMMENTED
+Reload systemd daemon to reload changes made in auditd service unit file:
+
+```
+$ systemctl daemon-reload
+```
+and/or
+```
+Restart the auditd service: service auditd restart
+```
 Upon restart of the daemon there is an entry in the log showing the rule was added. 
 ```
 type=CONFIG_CHANGE msg=audit(1512079682.652:109082): auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 op=add_rule key="files_in_tmp" list=4 res=1
